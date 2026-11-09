@@ -26,7 +26,7 @@ if(APPLE)
 endif()
 
 # Build Python extension
-pybind11_add_module(kelpy src/kelpy/kelpy.cpp)
+pybind11_add_module(kelpy NO_EXTRAS src/kelpy/kelpy.cpp)
 
 # Compiler optimizations
 if(MSVC)
