@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 project(kelpy LANGUAGES CXX)
 
 # 1. Force C++26 standard optimization flags
-set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 2. Pull in pybind11 configuration
