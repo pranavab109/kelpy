@@ -1,3 +1,4 @@
+
 name: Build Wheels
 
 on:
@@ -10,6 +11,7 @@ jobs:
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -17,21 +19,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Mac systems need OpenMP explicitly fetched before building
+      # Install OpenMP on macOS
       - name: Install OpenMP on macOS
         if: matrix.os == 'macos-latest'
         run: brew install libomp
 
+      # Cache cibuildwheel's downloaded tools
+      - name: Cache cibuildwheel
+        uses: actions/cache@v5
+        with:
+          path: ${{ runner.temp }}/cibw-cache
+          key: cibw-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            cibw-${{ runner.os }}-
+
+      # Build wheels
       - name: Build wheels via cibuildwheel
-        uses: pypa/cibuildwheel@v2.23.0
+        uses: pypa/cibuildwheel@v4.3.5
         env:
+          CIBW_CACHE_PATH: ${{ runner.temp }}/cibw-cache
+
           # Target standard modern CPython versions
           CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
+
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
           CIBW_BEFORE_ALL_LINUX: "dnf install -y libgomp"
 
+      # Upload generated wheels
       - uses: actions/upload-artifact@v4
         with:
           name: cibuildwheel-wheels-${{ matrix.os }}-${{ strategy.job-index }}
           path: ./wheelhouse/*.whl
-
