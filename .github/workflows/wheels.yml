@@ -27,6 +27,7 @@ jobs:
         env:
           # Target standard modern CPython versions
           CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
 
       - uses: actions/upload-artifact@v4
         with:
