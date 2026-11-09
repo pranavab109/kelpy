@@ -25,8 +25,6 @@ if(APPLE)
     endif()
 endif()
 
-find_package(OpenMP REQUIRED COMPONENTS CXX)
-
 # Build Python extension
 pybind11_add_module(kelpy src/kelpy/kelpy.cpp)
 
@@ -37,7 +35,45 @@ else()
     target_compile_options(kelpy PRIVATE -O3 -ffast-math -Wall)
 endif()
 
-target_link_libraries(kelpy PRIVATE OpenMP::OpenMP_CXX)
+# OpenMP configuration
+if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+
+    # LLVM installation directory
+    set(LLVM_ROOT "$ENV{LLVM_ROOT}")
+
+    if(NOT EXISTS "${LLVM_ROOT}/include/omp.h")
+        message(FATAL_ERROR "LLVM OpenMP header not found")
+    endif()
+
+    if(NOT EXISTS "${LLVM_ROOT}/lib/libomp.lib")
+        message(FATAL_ERROR "LLVM OpenMP library not found")
+    endif()
+
+    target_include_directories(kelpy PRIVATE
+        "${LLVM_ROOT}/include"
+    )
+
+    # Enable OpenMP with clang-cl
+    target_compile_options(kelpy PRIVATE
+        -Xclang -fopenmp
+    )
+
+    target_link_libraries(kelpy PRIVATE
+        "${LLVM_ROOT}/lib/libomp.lib"
+    )
+
+    # Windows does not provide the POSIX ssize_t type.
+    # Use Python's pointer-sized signed integer type instead.
+    target_compile_definitions(kelpy PRIVATE
+        ssize_t=Py_ssize_t
+    )
+
+else()
+
+    find_package(OpenMP REQUIRED COMPONENTS CXX)
+    target_link_libraries(kelpy PRIVATE OpenMP::OpenMP_CXX)
+
+endif()
 
 # Install extension into wheel
 install(TARGETS kelpy
