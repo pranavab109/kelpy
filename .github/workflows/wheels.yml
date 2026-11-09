@@ -53,6 +53,18 @@ jobs:
           "$env:ProgramFiles\LLVM\bin" >> $env:GITHUB_PATH
           "LLVM_ROOT=C:/Program Files/LLVM" >> $env:GITHUB_ENV
 
+      - name: Check LLVM installation
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          Write-Host "LLVM_ROOT=$env:LLVM_ROOT"
+          Get-ChildItem "$env:ProgramFiles\LLVM" -Recurse -Filter omp.h |
+            Select-Object -ExpandProperty FullName
+          Get-ChildItem "$env:ProgramFiles\LLVM" -Recurse -Filter libomp.lib |
+            Select-Object -ExpandProperty FullName
+          Get-ChildItem "$env:ProgramFiles\LLVM" -Recurse -Filter libomp.dll |
+            Select-Object -ExpandProperty FullName
+
       # Build wheels
       - name: Build wheels via cibuildwheel
         uses: pypa/cibuildwheel@v4.3.5
