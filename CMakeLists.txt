@@ -5,10 +5,12 @@ project(kelpy LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Find pybind11
+# Modern Python discovery
+set(PYBIND11_FINDPYTHON ON)
+find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 find_package(pybind11 CONFIG REQUIRED)
 
-# Help CMake locate Homebrew's OpenMP installation on macOS
+# Find Homebrew OpenMP on macOS
 if(APPLE)
     execute_process(
         COMMAND brew --prefix libomp
@@ -23,7 +25,6 @@ if(APPLE)
     endif()
 endif()
 
-# Find OpenMP
 find_package(OpenMP REQUIRED COMPONENTS CXX)
 
 # Build Python extension
@@ -36,5 +37,10 @@ else()
     target_compile_options(kelpy PRIVATE -O3 -ffast-math -Wall)
 endif()
 
-# Link OpenMP
 target_link_libraries(kelpy PRIVATE OpenMP::OpenMP_CXX)
+
+# Install extension into wheel
+install(TARGETS kelpy
+    LIBRARY DESTINATION .
+    RUNTIME DESTINATION .
+)
