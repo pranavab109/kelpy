@@ -80,7 +80,7 @@ jobs:
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} -v {wheel}"
 
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
-          CIBW_BEFORE_ALL_LINUX: "dnf install -y libgomp"
+          CIBW_BEFORE_ALL_LINUX: "yum install -y libgomp"
 
       # Upload generated wheels
       - uses: actions/upload-artifact@v4
