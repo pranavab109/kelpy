@@ -22,7 +22,10 @@ jobs:
       # Install OpenMP on macOS
       - name: Install OpenMP on macOS
         if: matrix.os == 'macos-latest'
-        run: brew install libomp
+        run: |
+          export MACOSX_DEPLOYMENT_TARGET=11.0
+          brew install --build-from-source libomp
+          echo "OpenMP_ROOT=$(brew --prefix libomp)" >> $GITHUB_ENV
 
       # Cache cibuildwheel's downloaded tools
       - name: Cache cibuildwheel
@@ -37,6 +40,7 @@ jobs:
       - name: Build wheels via cibuildwheel
         uses: pypa/cibuildwheel@v4.3.5
         env:
+          MACOSX_DEPLOYMENT_TARGET: "11.0"
           CIBW_CACHE_PATH: ${{ runner.temp }}/cibw-cache
 
           # Target standard modern CPython versions
