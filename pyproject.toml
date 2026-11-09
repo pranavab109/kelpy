@@ -1,0 +1,17 @@
+[build-system]
+requires = ["scikit-build-core>=0.8.0", "pybind11>=2.12"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "kelpy"
+version = "0.1.0"
+description = "High-performance C++ tensor library with OpenMP and pybind11"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [] # Compiled module is completely standalone at runtime
+
+[tool.scikit-build]
+# Keeps configuration strictly declarative
+cmake.version = ">=3.22"
+ninja.version = ">=1.11"
+
