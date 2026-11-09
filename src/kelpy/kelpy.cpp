@@ -1802,7 +1802,7 @@ private:
                 std::vector<size_t> coord(n->shape.size(), 0);
                 size_t ni = n->offset;
                 size_t pi = p->offset;
-                for (size_t x = 0; x < n->length; ++n) {
+                for (size_t x = 0; x < n->length; ++x) {
                     if (p->storage->data[pi] >= 0) {
                         p->grad_storage->data[pi] += n->grad_storage->data[ni];
                     }
@@ -1842,7 +1842,7 @@ private:
                 std::vector<size_t> coord(n->shape.size(), 0);
                 size_t ni = n->offset;
                 size_t pi = p->offset;
-                for (size_t x = 0; x < n->length; ++n) {
+                for (size_t x = 0; x < n->length; ++x) {
                     float a = p->storage->data[pi];
                     p->grad_storage->data[pi] += n->grad_storage->data[ni] * (a >= 0 ? 1 : n->alpha);
 
@@ -1878,10 +1878,10 @@ private:
                 std::vector<size_t> coord(n->shape.size(), 0);
                 size_t ni = n->offset;
                 size_t pi = p->offset;
-                for (size_t x = 0; x < n->length; ++n) {
-                    float x = p->storage->data[pi];
-                    float z = std::tanh(std::sqrt(2.0f / std::numbers::pi) * (x + 0.044715 * x * x * x));
-                    p->grad_storage->data[pi] += n->grad_storage->data[ni] * 0.5f * (1 + z + x * std::sqrt(2.0f / std::numbers::pi) * (1 + 0.134145 * x * x) * (1 - z * z));
+                for (size_t x = 0; x < n->length; ++x) {
+                    float v = p->storage->data[pi];
+                    float z = std::tanh(std::sqrt(2.0f / std::numbers::pi) * (v + 0.044715 * v * v * v));
+                    p->grad_storage->data[pi] += n->grad_storage->data[ni] * 0.5f * (1 + z + v * std::sqrt(2.0f / std::numbers::pi) * (1 + 0.134145 * v * v) * (1 - z * z));
 
                     for (int d = n->shape.size() - 1; d >= 0; --d) {
                         ++coord[d];
