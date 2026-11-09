@@ -1,4 +1,4 @@
-# tensorlib
+# kelpy
 
 A high-performance tensor library for Python with a C++ backend.
 
@@ -8,15 +8,15 @@ A high-performance tensor library for Python with a C++ backend.
 If you are installing a stable release, simply download the appropriate pre-compiled wheel for your platform from GitHub releases or your package registry and run:
 
 ```bash
-pip install tensorlib
+pip install kelpy
 ```
 
 ### Building from Source (Local Development)
 To compile and build the package locally from source, ensure you have a modern C++ compiler installed on your machine along with CMake. Then, run:
 
 ```bash
-git clone https://github.com
-cd YOUR_REPO_NAME
+git clone https://github.com/pranavab109/kelpy.git
+cd kelpy.git
 pip install -e .
 ```
 
