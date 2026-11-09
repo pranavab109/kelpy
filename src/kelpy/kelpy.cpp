@@ -5109,7 +5109,7 @@ std::vector<Slice> parse_slices(
 }
 
 
-PYBIND11_MODULE(tensorlib, t) {
+PYBIND11_MODULE(kelpy, t) {
     py::class_<Tensor>(t, "Tensor")
         .def(py::init<std::vector<size_t>, const bool>(), py::arg("shape"), py::arg("requires_grad") = false)
         .def(py::init<std::vector<size_t>, std::vector<float>, const bool>(), py::arg("shape"), py::arg("data"), py::arg("requires_grad") = false)
