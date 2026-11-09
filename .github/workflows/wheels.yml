@@ -36,17 +36,35 @@ jobs:
           restore-keys: |
             cibw-${{ runner.os }}-
 
+            # Set up the MSVC environment needed by clang-cl
+      - name: Set up MSVC environment
+        if: matrix.os == 'windows-latest'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      # Install LLVM and its OpenMP runtime
+      - name: Install LLVM on Windows
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          choco install llvm --yes --no-progress
+
+          "$env:ProgramFiles\LLVM\bin" >> $env:GITHUB_PATH
+          "LLVM_ROOT=C:/Program Files/LLVM" >> $env:GITHUB_ENV
+
       # Build wheels
       - name: Build wheels via cibuildwheel
         uses: pypa/cibuildwheel@v4.3.5
         env:
-          MACOSX_DEPLOYMENT_TARGET: "11.0"
-          CIBW_CACHE_PATH: ${{ runner.temp }}/cibw-cache
+          CMAKE_GENERATOR: Ninja
 
-          # Target standard modern CPython versions
           CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
-          CIBW_ARCHS_WINDOWS: AMD64
-          CIBW_BUILD_VERBOSITY: "1"
+
+          CIBW_ENVIRONMENT_WINDOWS: "CC=clang-cl CXX=clang-cl"
+
+          CIBW_BEFORE_BUILD_WINDOWS: "pip install delvewheel"
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} -v {wheel}"
 
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
           CIBW_BEFORE_ALL_LINUX: "dnf install -y libgomp"
