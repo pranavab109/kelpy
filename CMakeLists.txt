@@ -41,7 +41,7 @@ if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # LLVM installation directory
     set(LLVM_ROOT "$ENV{LLVM_ROOT}")
 
-    if(NOT EXISTS "${LLVM_ROOT}/include/omp.h")
+    if(NOT EXISTS "${LLVM_ROOT}/lib/clang/20/include/omp.h")
         message(FATAL_ERROR "LLVM OpenMP header not found")
     endif()
 
