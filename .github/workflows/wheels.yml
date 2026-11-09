@@ -69,6 +69,7 @@ jobs:
       - name: Build wheels via cibuildwheel
         uses: pypa/cibuildwheel@v4.3.5
         env:
+          CIBW_ARCHS_WINDOWS: AMD64
           CMAKE_GENERATOR: Ninja
 
           CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
