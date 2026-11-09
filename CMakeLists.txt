@@ -27,7 +27,7 @@ endif()
 find_package(OpenMP REQUIRED COMPONENTS CXX)
 
 # Build Python extension
-pybind11_add_module(kelpy src/kelpy.cpp)
+pybind11_add_module(kelpy src/kelpy/kelpy.cpp)
 
 # Compiler optimizations
 if(MSVC)
