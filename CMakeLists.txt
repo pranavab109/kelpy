@@ -50,7 +50,7 @@ if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     endif()
 
     target_include_directories(kelpy PRIVATE
-        "${LLVM_ROOT}/include"
+        "${LLVM_ROOT}/lib/clang/20/include"
     )
 
     # Enable OpenMP with clang-cl
