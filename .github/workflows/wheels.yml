@@ -20,19 +20,50 @@ jobs:
       - uses: actions/checkout@v4
 
       # Install OpenMP on macOS
+      
       - name: Install OpenMP (macOS)
         if: runner.os == 'macOS'
         shell: bash
-        env:
-          MACOSX_DEPLOYMENT_TARGET: "11.0"
-          CMAKE_OSX_DEPLOYMENT_TARGET: "11.0"
         run: |
-          brew uninstall --ignore-dependencies libomp || true
-          brew install --build-from-source libomp
+          set -e
       
+          # Download the exact Homebrew formula version used by this runner.
+          curl -fsSL \
+            https://raw.githubusercontent.com/Homebrew/homebrew-core/ffc79088768f59d49d304f3ff00de576b4ea8f69/Formula/lib/libomp.rb \
+            -o /tmp/libomp.rb
+      
+          # Override Homebrew's deployment target in BOTH CMake builds.
+          python3 - <<'PY'
+          from pathlib import Path
+      
+          formula = Path("/tmp/libomp.rb")
+          source = formula.read_text()
+      
+          old = "*std_cmake_args"
+          new = (
+              '*std_cmake_args, '
+              '"-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0", '
+              '"-DCMAKE_OSX_ARCHITECTURES=arm64"'
+          )
+      
+          assert source.count(old) == 2, "Unexpected Homebrew formula layout"
+      
+          formula.write_text(source.replace(old, new))
+          PY
+      
+          # Build the patched formula from source.
+          brew uninstall --ignore-dependencies libomp || true
+          brew install --build-from-source /tmp/libomp.rb
+      
+          # Verify the actual runtime deployment target.
           echo "Checking libomp deployment target:"
           otool -l "$(brew --prefix libomp)/lib/libomp.dylib" |
             grep -A 5 LC_BUILD_VERSION
+      
+          # Fail immediately if the runtime is not compatible with macOS 11.
+          otool -l "$(brew --prefix libomp)/lib/libomp.dylib" |
+            grep -A 5 LC_BUILD_VERSION |
+            grep -q "minos 11.0"
 
       # Cache cibuildwheel's downloaded tools
       - name: Cache cibuildwheel
